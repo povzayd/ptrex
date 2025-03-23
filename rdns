@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# Prompt user for input
+read -p "Enter an IP, CIDR range, or a file path: " input_data
+
+# Temporary file for counting progress and storing results
+count_file=$(mktemp)
+out_file=$(mktemp)
+
+# Function to perform reverse DNS lookup
+reverse_dns_lookup() {
+    local ip="$1"
+    local total_requests="$2"
+
+    # Perform reverse DNS lookup
+    result=$(getent hosts "$ip" | awk '{print $2}')
+
+    # Atomically update progress counter
+    {
+        read -r count < "$count_file"
+        echo $((count + 1)) > "$count_file"
+        echo -ne "\r[+] Requests made: $((count + 1)) / $total_requests"
+    } 2>/dev/null
+
+    # Save only successful lookups (without IPs)
+    if [[ -n "$result" ]]; then
+        echo "-> $result" >> "$out_file"
+    fi
+}
+
+# Determine input type
+if [[ -f "$input_data" ]]; then
+    echo "[+] Processing IPs from file: $input_data"
+    ips=$(cat "$input_data")
+elif [[ "$input_data" =~ "/" ]]; then
+    echo "[+] Expanding CIDR range: $input_data"
+
+    # Check if prips is installed
+    if ! command -v prips &>/dev/null; then
+        echo "[ERROR] prips is not installed! Install it using: sudo apt install prips"
+        exit 1
+    fi
+
+    ips=$(prips "$input_data")
+else
+    echo "[+] Performing lookup for single IP: $input_data"
+    reverse_dns_lookup "$input_data" 1
+    cat "$out_file"
+    rm -f "$count_file" "$out_file"
+    exit 0
+fi
+
+# Get total requests count
+total_requests=$(echo "$ips" | wc -l)
+echo 0 > "$count_file"
+
+# Perform lookups in parallel
+export count_file total_requests out_file
+
+echo "$ips" | xargs -P 50 -I {} bash -c '
+    reverse_dns_lookup() {
+        local ip="$1"
+        local total_requests="$2"
+        result=$(getent hosts "$ip" | awk "{print \$2}")
+        {
+            read -r count < "$count_file"
+            echo $((count + 1)) > "$count_file"
+            echo -ne "\r[+] Requests made: $((count + 1)) / $total_requests"
+        } 2>/dev/null
+        [[ -n "$result" ]] && echo "-> $result" >> "$out_file"
+    }
+    reverse_dns_lookup "{}" "$total_requests"
+'
+
+# Cleanup
+rm -f "$count_file"
+echo -e "\n[+] Completed!"
+
+# Display cleaned output without IP addresses
+cat "$out_file"
+rm -f "$out_file"
+# fingers crossed hope thiss works....
+                                                                
