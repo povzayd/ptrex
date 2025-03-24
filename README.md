@@ -87,3 +87,13 @@ mv ptrex /usr/sbin
 ✨ Support custom concurrency levels
 
 This script is great for security assessments, network mapping, and passive reconnaissance when identifying hostnames associated with an IP range. 🌍
+---
+*PLEASE NOTE THAT THE SCRIPT GIVES OUTPUT IN THE FORM OF
+```
+-> some.pointer.record.abc.com
+```
+IF YOU WANT TO REMOVE IT FROM YOUR TXT FILE JUST USE THE COMMAND 
+```
+sed -i 's/->//g' file.txt
+```
+THIS WILL REMOVE `->` FROM EACH & EVERY LINE OF YOUR FILE.
