@@ -15,10 +15,8 @@ This Bash script performs reverse DNS (PTR) lookups on a given IP, CIDR range, o
 
 Ensure you have prips installed for CIDR expansion:
 
-'''
 bash
 sudo apt install prips
-'''
 
 🚀 Usage
 
