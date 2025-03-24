@@ -25,7 +25,7 @@ Run the script and enter an IP, CIDR range, or a file path when prompted:
 
 ```
 bash
-./PTRex
+./ptrex
 ```
 🚀 Global Package 
 Making this shell script global will alow you to execute this in any directory
