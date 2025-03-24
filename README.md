@@ -9,12 +9,16 @@ This Bash script performs reverse DNS (PTR) lookups on a given IP, CIDR range, o
 ✅ Filters and outputs only successful PTR lookups (hostnames only) 🛠
 
 🚀 Installation
-Ensure you have `prips` installed for CIDR expansion:
+Ensure you have `prips` `git` installed for CIDR expansion:
 
 ```
 bash
-sudo apt install prips
+sudo apt install prips git
+git clone https://github.com/povzayd/ptrex.git
+cd ptrex && chmod +x *
+./ptrex
 ```
+
 
 🚀 Usage
 Run the script and enter an IP, CIDR range, or a file path when prompted:
@@ -23,7 +27,15 @@ Run the script and enter an IP, CIDR range, or a file path when prompted:
 bash
 ./PTRex
 ```
-
+🚀 Global Package 
+Making this shell script global will alow you to execute this in any directory
+For that just move the file `ptrex` to `bin` or `sbin`
+```
+bash
+mv ptrex /usr/bin
+or
+mv ptrex /usr/sbin
+```
 *📌 Example Inputs*
 1️⃣ Single IP: `8.8.8.8`
 2️⃣ CIDR Range: `192.168.1.0/24`
